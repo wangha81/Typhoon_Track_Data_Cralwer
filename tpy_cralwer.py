@@ -20,6 +20,7 @@ def parser(fn):
                 TyphoonUnit['Route'] = Route
                 dataSource.append(TyphoonUnit)
                 TyphoonUnit = None
+                Route = []
             else:
                 Route = []
             header = list(filter(h, data))
@@ -92,11 +93,32 @@ def parser(fn):
                     'CentralPressure':pointInfo[5],
                 }
             Route.append(point)
+    return dataSource
+def convert(dataSource):
+    import os, shutil, json
+    dir = './dataSource/'
+    shutil.rmtree(dir, ignore_errors=True)
+    os.makedirs(dir)
+    fnList = []
+    for tpy in dataSource:
+        fn = "".join([tpy['Date'],"_", tpy['International_number_ID'] ,".json"])
+        fp = open(dir+fn,'w')
+        fp.write(json.dumps(tpy, indent=4))
+        fp.flush()
+        fp.close()
+        fnList.append(fn)
+    fp = open('file_list.json','w')
+    fp.write(json.dumps(fnList, indent=4))
+    fp.flush()
+    fp.close()
 if __name__ == '__main__':
     import requests
     import io
     import zipfile
-    import json
     url_zip = "http://www.jma.go.jp/jma/jma-eng/jma-center/rsmc-hp-pub-eg/Besttracks/bst_all.zip"
-    file_name = "bst_all.txt"#download_extract_zip(url_zip)
+    print("Downloading...")
+    file_name = download_extract_zip(url_zip)#"bst_all.txt"#
+    print("Parsing...")
     dataSource = parser(file_name)
+    print("Exporting...")
+    convert(dataSource)
