@@ -4,6 +4,9 @@ def download_extract_zip(zip_file_url):
     z.extractall()
     return z.namelist()[0]
 def parser(fn):
+    from datetime import datetime
+    now_s = datetime.now().strftime("%Y")
+    f_s, e_s = now_s[:2], now_s[2:]
     file = open(fn, 'r')
     Route = None
     TyphoonUnit = None
@@ -18,6 +21,7 @@ def parser(fn):
         if Indicator_header:            
             if Route != None:
                 TyphoonUnit['Route'] = Route
+                TyphoonUnit['FirstPointDate'] = Route[0]['Time']
                 dataSource.append(TyphoonUnit)
                 TyphoonUnit = None
                 Route = []
@@ -34,7 +38,7 @@ def parser(fn):
                     'Flag':header[5],
                     'DurationOfTimeUnit':header[6],
                     'Name':header[7],
-                    'Date':header[8],
+                    'LastRevisionDate':header[8],
                     'Type':'9'
                 }
             elif dataType == 8:
@@ -92,6 +96,13 @@ def parser(fn):
                     'Longitude':pointInfo[4],
                     'CentralPressure':pointInfo[5],
                 }
+            time_s_c = point['Time']
+            if time_s_c[:2] > e_s:
+                time_s_c = str(int(f_s) - 1) + time_s_c
+            else:
+                time_s_c = f_s + time_s_c
+            time_s_c = '{}-{}-{}T{}:00:00'.format(time_s_c[:4],time_s_c[4:6],time_s_c[6:8],time_s_c[8:10])
+            point['Time'] = time_s_c
             Route.append(point)
     return dataSource
 def convert(dataSource):
@@ -101,7 +112,7 @@ def convert(dataSource):
     os.makedirs(dir)
     fnList = []
     for tpy in dataSource:
-        fn = "".join([tpy['Date'],"_", tpy['International_number_ID'] ,".json"])
+        fn = "".join([ tpy['FirstPointDate'][:4]+'_'+tpy['International_number_ID'] ,".json"])
         fp = open(dir+fn,'w')
         fp.write(json.dumps(tpy, indent=4))
         fp.flush()
