@@ -75,7 +75,8 @@ def parser(fn):
                     'Maximum_sustained_wind_speed':pointInfo[6],
                     'Direction_LR50plus':pointInfo[7][0],
                     'Longest_radius_of_50kt':int(pointInfo[7][1:]),
-                    'Shortest_radius_of_50kt':int(pointInfo[8]),
+                    'Direction_LR30plus':pointInfo[8][0],
+                    'Shortest_radius_of_50kt':int(pointInfo[8][1:]),
                     'Longest_radius_of_30kt':int(pointInfo[9]),
                     'Shortest_radius_of_30kt':int(pointInfo[10]),
                 }
