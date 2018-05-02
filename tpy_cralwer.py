@@ -74,10 +74,10 @@ def parser(fn):
                     'CentralPressure':pointInfo[5],
                     'Maximum_sustained_wind_speed':pointInfo[6],
                     'Direction_LR50plus':pointInfo[7][0],
-                    'Longest_radius_of_50kt':pointInfo[7][1:],
-                    'Shortest_radius_of_50kt':pointInfo[8],
-                    'Longest_radius_of_30kt':pointInfo[9],
-                    'Shortest_radius_of_30kt':pointInfo[10],
+                    'Longest_radius_of_50kt':int(pointInfo[7][1:]),
+                    'Shortest_radius_of_50kt':int(pointInfo[8]),
+                    'Longest_radius_of_30kt':int(pointInfo[9]),
+                    'Shortest_radius_of_30kt':int(pointInfo[10]),
                 }
             elif dataType == 7:
                 point = {
@@ -96,6 +96,7 @@ def parser(fn):
                     'Longitude':pointInfo[4],
                     'CentralPressure':pointInfo[5],
                 }
+
             time_s_c = point['Time']
             if time_s_c[:2] > e_s:
                 time_s_c = str(int(f_s) - 1) + time_s_c
@@ -103,6 +104,9 @@ def parser(fn):
                 time_s_c = f_s + time_s_c
             time_s_c = '{}-{}-{}T{}:00:00'.format(time_s_c[:4],time_s_c[4:6],time_s_c[6:8],time_s_c[8:10])
             point['Time'] = time_s_c
+
+            point['Latitude'] = int(point['Latitude']) / 10
+            point['Longitude'] = int(point['Longitude']) / 10
             Route.append(point)
     return dataSource
 def convert(dataSource):
